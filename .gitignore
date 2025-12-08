@@ -1,0 +1,75 @@
+# ------------------------
+# Python
+# ------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+*.log
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+.coverage
+.coverage.*
+.cache
+.cache/
+pytestdebug.log
+
+# virtual environment
+venv/
+env/
+ENV/
+.venv/
+pip-wheel-metadata/
+pip-log.txt
+
+# ------------------------
+# FastAPI project
+# ------------------------
+# local env config
+.env
+.env.*
+
+# Static files (예: 이미지 업로드 저장 폴더)
+static/
+uploads/
+media/
+
+# Alembic migration cache
+alembic.ini~
+alembic/versions/*.pyc
+
+# ------------------------
+# OS / Editor junk
+# ------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/settings.json   # (필요하면 예외)
+!.vscode/extensions.json
+
+# ------------------------
+# Docker
+# ------------------------
+# Docker local volumes
+data/
+docker-data/
+docker-entrypoint-initdb.d/
+
+# Docker build artifacts
+*.bak
+*.backup
+
+# ------------------------
+# Frontend (추후 Tailwind/Vite 쓰는 경우 대비)
+# ------------------------
+node_modules/
+dist/
+build/
