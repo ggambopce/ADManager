@@ -1,22 +1,37 @@
-from pydantic_settings import BaseSettings
+# app/core/config.py
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    DB_HOST: str = "127.0.0.1"
-    DB_PORT: int = 3306
-    DB_USER: str = "user"
-    DB_PASSWORD: str = "password"
-    DB_NAME: str = "admanager-mariadb"
+    # ===== 앱 기본 설정 =====
+    app_env: str = "local"           # APP_ENV
+    app_name: str = "ad-server"      # APP_NAME
 
-    REDIS_HOST: str = "127.0.0.1"
-    REDIS_PORT: int = 6379
-    REDIS_DB: int = 0
+    # ===== DB 설정 =====
+    db_host: str = "127.0.0.1"       # DB_HOST
+    db_port: int = 3306              # DB_PORT
+    db_user: str = "user"            # DB_USER
+    db_password: str = "1234"        # DB_PASSWORD
+    db_name: str = "admanager_mariadb"  # DB_NAME
 
-    SESSION_PREFIX: str = "adserver:session:"
-    SESSION_TTL: int = 86400
+    # ===== Redis 설정 =====
+    redis_host: str = "127.0.0.1"    # REDIS_HOST
+    redis_port: int = 6379           # REDIS_PORT
+    redis_db: int = 0                # REDIS_DB
+    redis_password: str | None = None
 
-    class Config:
-        env_file = ".env"
+    # ===== 세션 설정 =====
+    session_cookie_name: str = "admin_session"  # SESSION_COOKIE_NAME
+    session_expire_seconds: int = 86400         # SESSION_EXPIRE_SECONDS
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        # .env에 정의는 돼 있지만 모델에 없는 값이 있어도 무시하고 싶으면 ignore
+        extra="ignore",
+        # 엄격하게 하고 싶으면 위 줄을 extra="forbid" 로 바꾸고
+        # .env에 있는 키들을 전부 필드로 정의해주면 된다.
+    )
 
 
 settings = Settings()

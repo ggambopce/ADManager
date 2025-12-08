@@ -1,11 +1,23 @@
 fastapi
 uvicorn[standard]
-httpx
-psycopg[binary]
-SQLAlchemy
+
+sqlalchemy
 alembic
+
+redis
+
+httpx
+python-dotenv
+
+# SSH/SFTP (광고 이미지 배포 필요 시)
+paramiko
+
+# Pydantic v2
 pydantic
 pydantic-settings
-python-dotenv
-paramiko
-psycopg2-binary
+
+# multipart 업로드 처리
+python-multipart
+
+# 암호 해싱
+bcrypt
