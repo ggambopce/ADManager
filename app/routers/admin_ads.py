@@ -32,7 +32,6 @@ async def create_ad(
     """
     광고 등록
     - 이미지 파일 저장
-    - (선택) 숏링크 생성 로직은 나중에 AdService 안에서 확장
     """
     # 1) 이미지 저장
     image_url = AdService.save_image(image)
