@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ad Server Admin</title>
+  </head>
+  <body>
+    <h1>Ad Server Admin</h1>
+
+    <!-- 로그인 섹션 -->
+    <section id="login-section">
+      <h2>관리자 로그인</h2>
+      <form id="login-form">
+        <label>
+          ID:
+          <input type="text" name="loginId" value="admin" />
+        </label>
+        <label>
+          Password:
+          <input type="password" name="password" value="1234" />
+        </label>
+        <button type="submit">로그인</button>
+      </form>
+      <p id="login-result"></p>
+    </section>
+
+    <hr />
+
+    <!-- 현재 관리자 정보 -->
+    <section id="me-section" style="display:none;">
+      <h2>현재 관리자</h2>
+      <pre id="me-info"></pre>
+      <button id="logout-btn">로그아웃</button>
+    </section>
+
+    <hr />
+
+    <!-- 광고 등록 -->
+    <section id="create-ad-section" style="display:none;">
+      <h2>광고 등록</h2>
+      <form id="create-ad-form" enctype="multipart/form-data">
+        <div>
+          <label>
+            제목:
+            <input type="text" name="title" required />
+          </label>
+        </div>
+
+        <div>
+          <label>
+            설명:
+            <textarea name="description" rows="3" required></textarea>
+          </label>
+        </div>
+
+        <div>
+          <label>
+            랜딩 URL:
+            <input
+              type="url"
+              name="target_url"
+              placeholder="https://example.com"
+              required
+            />
+          </label>
+        </div>
+
+        <div>
+          <label>
+            이미지:
+            <input type="file" name="image" accept="image/*" required />
+          </label>
+        </div>
+
+        <button type="submit">광고 등록</button>
+      </form>
+
+      <p id="create-ad-result"></p>
+    </section>
+
+    <hr />
+
+    <section id="ads-section" style="display:none;">
+        <h2>광고 목록</h2>
+        <button id="load-ads-btn">광고 목록 불러오기</button>
+
+        <!-- 카드들이 렌더링될 영역 -->
+        <div id="ads-list" class="ads-flex">
+            <!-- JS에서 여기 안에 .ad-card 들이 들어감 -->
+        </div>
+    </section>
+
+    <hr />
+    <style>
+        .ads-flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .ad-card {
+            flex: 0 0 calc(33.333% - 16px);  /* 한 줄에 3개 고정 */
+            box-sizing: border-box;          /* 패딩/보더까지 포함해서 계산 */
+
+            min-width: 260px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ad-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .ad-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .ad-desc {
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .ad-url a {
+            font-size: 13px;
+            color: #0066cc;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        @media (max-width: 700px) {
+            .ad-card {
+            width: calc(50% - 16px);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .ad-card {
+            width: 100%;
+            }
+        }
+    </style>
+    <!-- 광고 단건 조회 / 수정 / 삭제 -->
+    <section id="ad-detail-section" style="display:none;">
+      <h2>광고 단건 조회 / 수정 / 삭제</h2>
+
+      <!-- 단건 조회 + 삭제 -->
+      <div>
+        <label>
+          광고 ID:
+          <input type="number" id="detail-ad-id" />
+        </label>
+        <button id="load-ad-detail-btn">조회</button>
+        <button id="delete-ad-btn">삭제</button>
+      </div>
+
+      <h3>광고 상세</h3>
+      <pre id="ad-detail-view"></pre>
+
+      <h3>광고 수정</h3>
+      <form id="update-ad-form">
+        <div>
+          <label>
+            제목:
+            <input type="text" name="title" />
+          </label>
+        </div>
+
+        <div>
+          <label>
+            설명:
+            <textarea name="description" rows="3"></textarea>
+          </label>
+        </div>
+
+        <div>
+          <label>
+            랜딩 URL:
+            <input
+              type="url"
+              name="target_url"
+              placeholder="https://example.com"
+            />
+          </label>
+        </div>
+        <button type="submit">수정 저장</button>
+      </form>
+      <p id="update-ad-result"></p>
+    </section>
+    <script src="main.js"></script>
+  </body>
+</html>

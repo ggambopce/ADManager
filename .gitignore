@@ -36,11 +36,6 @@ pip-log.txt
 .env
 .env.*
 
-# Static files (예: 이미지 업로드 저장 폴더)
-static/
-uploads/
-media/
-
 # Alembic migration cache
 alembic.ini~
 alembic/versions/*.pyc
