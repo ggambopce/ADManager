@@ -16,7 +16,7 @@ from app.core.database import Base
 class Ad(Base):
     """
     광고 테이블
-    - 이미지/내용/타겟 URL/숏링크 + 노출기간(start_at, end_at)
+    - 이미지/내용/타겟 URL/숏링크
     - is_active 로 비활성 처리 가능
     """
     __tablename__ = "ads"
@@ -34,10 +34,6 @@ class Ad(Base):
 
     # buly 등 외부 숏링크
     short_url = Column(String(500), nullable=True)
-
-    # 노출 시작/종료 시각 (없으면 상시 노출)
-    start_at = Column(DateTime, nullable=True)
-    end_at = Column(DateTime, nullable=True)
 
     # 논리적 활성화 여부 (soft delete 용도)
     is_active = Column(Boolean, nullable=False, server_default="1")

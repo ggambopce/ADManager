@@ -11,26 +11,19 @@ class AdBase(BaseModel):
     image_url: Optional[str] = None
     target_url: Optional[str] = None
     short_url: Optional[str] = None
-    start_at: Optional[datetime] = None
-    end_at: Optional[datetime] = None
-
+   
 
 class AdCreate(BaseModel):
     title: str
     description: Optional[str] = None
     target_url: Optional[str] = None
-    short_url: Optional[str] = None
-    start_at: Optional[datetime] = None
-    end_at: Optional[datetime] = None
 
 
 class AdUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     target_url: Optional[str] = None
-    short_url: Optional[str] = None
-    start_at: Optional[datetime] = None
-    end_at: Optional[datetime] = None
+   
 
 
 class AdResponse(AdBase):
@@ -46,3 +39,15 @@ class AdPageResponse(BaseModel):
     size: int
     total_elements: int
     total_pages: int
+
+
+class PublicAdResponse(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = None
+    image_url: Optional[str] = None
+    short_url: Optional[str] = None
+    target_url: Optional[str] = None
+
+class Config:
+        from_attributes = True

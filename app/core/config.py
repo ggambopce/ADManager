@@ -32,6 +32,10 @@ class Settings(BaseSettings):
         # 엄격하게 하고 싶으면 위 줄을 extra="forbid" 로 바꾸고
         # .env에 있는 키들을 전부 필드로 정의해주면 된다.
     )
+    # ===== buly API 설정 =====
+    buly_api_url: str = "https://www.buly.kr/api/shoturl.siso"  # BULY_API_URL
+    buly_customer_id: str = "205341530"                        # BULY_CUSTOMER_ID
+    buly_partner_api_id: str = "6131D27090895F3699A6B4D9F9B67023"
 
 
 settings = Settings()

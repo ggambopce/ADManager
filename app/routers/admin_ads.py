@@ -25,7 +25,6 @@ async def create_ad(
     title: str = Form(...),
     description: Optional[str] = Form(None),
     target_url: Optional[str] = Form(None),
-    short_url: Optional[str] = Form(None),
     image: UploadFile = File(...),
     current_admin=Depends(get_current_admin),
     db: Session = Depends(get_db),
@@ -43,9 +42,6 @@ async def create_ad(
         title=title,
         description=description,
         target_url=target_url,
-        short_url=short_url,
-        start_at=None,
-        end_at=None,
     )
 
     # 3) DB Insert
