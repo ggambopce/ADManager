@@ -8,7 +8,11 @@ from app.core.database import Base
 class AdminUser(Base):
     """
     관리자 계정 테이블
-    - 로그인 ID, 비밀번호 해시, 생성일시만 관리
+    - 관리자 로그인에 사용되는 계정 정보를 저장한다.
+    - 실제 인증(로그인) 시에는 login_id + password_hash 를 사용하고,
+      인증에 성공하면 Redis 세션 + 브라우저 쿠키를 통해 상태를 유지한다.
+    이 테이블 자체에는 세션 정보는 저장하지 않고
+    순수하게 관리자 계정 정보만 보관한다.
     """
     __tablename__ = "admin_users"
 

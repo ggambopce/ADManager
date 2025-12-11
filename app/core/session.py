@@ -22,7 +22,20 @@ async def create_admin_session(
     redis: Redis,
 ) -> str:
     """
-    로그인 성공 후 세션을 생성하고 쿠키를 세팅한다.
+    관리자 로그인 성공 후 세션을 생성하고, 브라우저에 세션 쿠키를 심는 함수.
+
+    [동작 개요]
+    1. 서버에서 무작위 session_id(UUID hex)를 생성한다.
+    2. Redis에 "admin_session:{session_id}" 라는 키로 세션 정보를 저장한다.
+       - Hash 구조로 {"loginId": <관리자 ID>} 형태로 저장.
+       - TTL은 settings.session_expire_seconds 로 설정한다.
+    3. 응답 헤더에 Set-Cookie 를 추가해서 브라우저에 session_id 를 내려준다.
+       - 쿠키 이름: SESSION_COOKIE_NAME (예: "admin_session")
+       - 쿠키 값: session_id
+       - HttpOnly, SameSite=Lax 등의 보안 옵션을 함께 적용한다.
+
+    이후 클라이언트는 매 요청마다 이 쿠키를 자동으로 보내고,
+    서버는 쿠키에 있는 session_id를 기준으로 Redis에서 세션을 조회한다.
     """
     session_id = uuid.uuid4().hex
     key = _session_key(session_id)
@@ -36,11 +49,11 @@ async def create_admin_session(
     response.set_cookie(
         key=SESSION_COOKIE_NAME,
         value=session_id,
-        httponly=True,
-        samesite="lax",
-        secure=False,  # 운영에서 https 쓰면 True로 변경
-        path="/",
-        max_age=settings.session_expire_seconds,
+        httponly=True,        # JS에서 접근 불가 → XSS에 의한 탈취 위험 줄이기
+        samesite="lax",       # CSRF에 대한 기본적인 보호 (필요 시 "strict" 나 "none" 으로 조정)
+        secure=False,         # HTTPS 환경(prod)에서는 True 로 변경하는 것을 권장
+        path="/",             # 전체 경로에서 쿠키를 전송하도록 설정
+        max_age=settings.session_expire_seconds,  # 브라우저 쿠키 만료 시간
     )
 
     return session_id
@@ -52,7 +65,12 @@ async def delete_admin_session(
     redis: Redis,
 ) -> None:
     """
-    로그아웃 시 세션 삭제 + 쿠키 제거.
+    로그아웃 시 세션 삭제 + 쿠키 제거를 담당하는 함수.
+
+    [동작 개요]
+    1. 요청 쿠키에서 session_id를 읽어온다.
+    2. Redis에서 "admin_session:{session_id}" 키를 삭제한다.
+    3. 응답에 delete_cookie 를 호출해서 브라우저 쿠키도 제거한다.
     """
     session_id = request.cookies.get(SESSION_COOKIE_NAME)
     if session_id:
@@ -66,7 +84,15 @@ async def get_current_admin(
     redis: Redis = Depends(get_redis),
 ) -> dict:
     """
-    현재 admin 세션 정보 조회. 없으면 401.
+    현재 요청의 관리자 세션 정보를 조회하는 Depends 함수.
+    [동작 개요]
+    1. 요청 쿠키에서 session_id 를 읽는다.
+       - 없으면 401 UNAUTHORIZED.
+    2. Redis에서 "admin_session:{session_id}" 키를 조회한다.
+       - 세션 정보가 없거나 TTL로 만료된 경우 401 UNAUTHORIZED.
+    3. 세션 Hash에서 loginId 등 필요한 값을 반환한다.
+    이 함수는 FastAPI Depends 로 주입하여,
+    관리자 전용 API에서 인증/인가 미들웨어 역할처럼 사용할 수 있다.
     """
     session_id = request.cookies.get(SESSION_COOKIE_NAME)
     if not session_id:

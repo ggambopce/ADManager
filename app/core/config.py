@@ -1,7 +1,12 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 class Settings(BaseSettings):
+    """
+    애플리케이션 전역 설정 값을 관리하는 클래스.
+    - .env 파일에 정의된 환경변수를 읽어서 필드에 매핑한다.
+    - 여기서 session_cookie_name, session_expire_seconds, Redis 설정 등이
+      세션 기반 로그인에 직접 사용된다.
+    """
     # ===== 앱 기본 설정 =====
     app_env: str = "local"           # APP_ENV
     app_name: str = "ad-server"      # APP_NAME
@@ -20,8 +25,10 @@ class Settings(BaseSettings):
     redis_password: str | None = None
 
     # ===== 세션 설정 =====
+    # 관리자 세션 쿠키 이름.
+    # 브라우저에는 이 이름으로 session_id가 저장된다.
     session_cookie_name: str = "admin_session"  # SESSION_COOKIE_NAME
-    session_expire_seconds: int = 86400         # SESSION_EXPIRE_SECONDS
+    session_expire_seconds: int = 8640000000    # SESSION_EXPIRE_SECONDS
 
     model_config = SettingsConfigDict(
         env_file=".env",
