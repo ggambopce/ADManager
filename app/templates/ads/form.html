@@ -1,0 +1,65 @@
+{# templates/ads/form.html #}
+{% extends "base.html" %}
+
+{% block title %}
+  {% if mode == "edit" %}광고 수정{% else %}광고 등록{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="card">
+  <div class="card-header">
+    <h1>
+      {% if mode == "edit" %}광고 수정{% else %}광고 등록{% endif %}
+    </h1>
+  </div>
+
+  <input type="hidden" id="form-mode" value="{{ mode }}" />
+  <input type="hidden" id="ad-id" value="{{ ad_id or '' }}" />
+
+  <form id="ad-form" class="form" enctype="multipart/form-data">
+    <div class="form-row">
+      <label for="title">제목</label>
+      <input type="text" id="title" name="title" required />
+    </div>
+
+    <div class="form-row">
+      <label for="description">설명</label>
+      <textarea
+        id="description"
+        name="description"
+        rows="4"
+        required
+      ></textarea>
+    </div>
+
+    <div class="form-row">
+      <label for="target_url">랜딩 URL</label>
+      <input
+        type="url"
+        id="target_url"
+        name="target_url"
+        placeholder="https://example.com"
+        required
+      />
+    </div>
+
+    <div class="form-row" id="image-row">
+      <label for="image">이미지 (등록 시 필수)</label>
+      <input type="file" id="image" name="image" accept="image/*" />
+      <div id="current-image" class="message"></div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">
+        {% if mode == "edit" %}수정 저장{% else %}등록{% endif %}
+      </button>
+      <button type="button" id="btn-cancel" class="btn-secondary">취소</button>
+    </div>
+  </form>
+
+  <p id="form-message" class="message"></p>
+</section>
+
+<script src="/static/js/ads_form.js"></script>
+
+{% endblock %}

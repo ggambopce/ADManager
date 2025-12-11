@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}Ad Admin{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="logo">Ad Admin</div>
+        <!-- 오른쪽: 메뉴 + 로그인 영역 -->
+        <div class="topbar-right">
+          <nav class="top-nav">
+            <a href="/ads">광고 목록</a>
+            <a href="/ads/new">광고 등록</a>
+          </nav>
+
+          <!-- 로그인 전 -->
+          <form id="login-form" class="login-form-inline">
+            <input
+              type="text"
+              name="loginId"
+              placeholder="ID"
+              value="admin"
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value="1234"
+            />
+            <button type="submit">로그인</button>
+          </form>
+
+          <!-- 로그인 결과 메시지 -->
+          <span id="login-result" class="login-result-text"></span>
+
+          <!-- 로그인 후 -->
+          <div id="topbar-user" class="topbar-user">
+            <span>관리자: <strong id="admin-name"></strong></span>
+            <button id="logout-btn" type="button">로그아웃</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- 헤더용 로그인/로그아웃 스크립트 (모든 페이지 공통) -->
+    <script src="/static/js/admin_auth.js"></script>
+  </body>
+</html>

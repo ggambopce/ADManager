@@ -21,3 +21,6 @@ python-multipart
 
 # 암호 해싱
 bcrypt
+
+#FastAPI 템플릿
+jinja2

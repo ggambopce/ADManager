@@ -1,0 +1,48 @@
+{# templates/ads/detail.html #}
+{% extends "base.html" %}
+
+{% block title %}광고 상세{% endblock %}
+
+{% block content %}
+<section class="card">
+  <div class="card-header">
+    <h1>광고 상세</h1>
+    <div>
+      <button id="btn-back" class="btn-secondary">목록</button>
+      <button id="btn-edit" class="btn-primary">수정</button>
+      <button id="btn-delete" class="btn-danger">삭제</button>
+    </div>
+  </div>
+
+  <input type="hidden" id="ad-id" value="{{ ad_id }}" />
+
+  <div class="detail-row">
+    <span class="detail-label">ID</span>
+    <span id="detail-id" class="detail-value"></span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">제목</span>
+    <span id="detail-title" class="detail-value"></span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">설명</span>
+    <pre id="detail-description" class="detail-value detail-pre"></pre>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">URL</span>
+    <span id="detail-url" class="detail-value"></span>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">이미지</span>
+    <div id="detail-image" class="detail-value"></div>
+  </div>
+  <div class="detail-row">
+    <span class="detail-label">등록일</span>
+    <span id="detail-created" class="detail-value"></span>
+  </div>
+
+  <p id="detail-message" class="message"></p>
+</section>
+
+<script src="/static/js/ads_detail.js"></script>
+{% endblock %}

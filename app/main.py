@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from app.core.database import engine
 from app.models import Base
 
-from app.routers import admin_auth, admin_ads, public_ads
+from app.routers import admin_auth, admin_ads, public_ads, page_ads
 
 app = FastAPI()
 
@@ -23,3 +23,6 @@ app.mount(
 app.include_router(admin_auth.router, prefix="/api")
 app.include_router(admin_ads.router, prefix="/api")
 app.include_router(public_ads.router, prefix="/api")
+
+# 페이지 라우터
+app.include_router(page_ads.router)

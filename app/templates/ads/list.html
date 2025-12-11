@@ -1,0 +1,31 @@
+{# templates/ads/list.html #}
+{% extends "base.html" %}
+
+{% block title %}광고 목록{% endblock %}
+
+{% block content %}
+<section class="card">
+  <div class="card-header">
+    <h1>광고 목록</h1>
+    <button id="btn-new" class="btn-primary">새 광고 등록</button>
+  </div>
+
+  <table class="table" id="ads-table">
+    <thead>
+      <tr>
+        <th style="width: 60px">ID</th>
+        <th>제목</th>
+        <th style="width: 200px">랜딩 URL</th>
+        <th style="width: 120px">등록일</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- JS가 채움 -->
+    </tbody>
+  </table>
+
+  <p id="list-message" class="message"></p>
+</section>
+
+<script src="/static/js/ads_list.js"></script>
+{% endblock %}
