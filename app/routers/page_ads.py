@@ -7,6 +7,9 @@ templates = Jinja2Templates(directory="app/templates")
 
 router = APIRouter(tags=["pages-ads"])
 
+@router.get("/")
+def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @router.get("/ads", response_class=HTMLResponse)
 async def ads_list_page(request: Request):

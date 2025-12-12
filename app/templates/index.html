@@ -1,0 +1,408 @@
+{# templates/index.html #}
+{% extends "base/base.html" %}
+
+{% block title %}AD Manager 홈{% endblock %}
+
+{% block content %}
+  <section class="hero">
+    <div class="hero-main">
+      <h1>Ad Server Admin 대시보드</h1>
+      <p class="hero-subtitle">
+        광고 이미지를 등록하고, Buly 숏링크와 함께 각 백엔드 서비스에 노출할 광고를 관리한다.
+      </p>
+
+      <div class="hero-actions">
+        <a href="/ads" class="btn-primary">광고 목록 보기</a>
+        <a href="/ads/new" class="btn-secondary">새 광고 등록</a>
+      </div>
+    </div>
+
+    <div class="hero-side">
+      <div class="hero-info-card">
+        <h2>관리자 작업</h2>
+
+        <div class="admin-task">
+          <div class="task-icon">📋</div>
+          <div class="task-body">
+            <a href="/ads" class="task-title">전체 광고 목록 관리</a>
+            <p class="task-desc">등록된 광고를 조회하고, 수정 · 삭제를 수행한다.</p>
+          </div>
+        </div>
+
+        <div class="admin-task">
+          <div class="task-icon">🆕</div>
+          <div class="task-body">
+            <a href="/ads/new" class="task-title">새 광고 등록</a>
+            <p class="task-desc">이미지 업로드, 설명, 랜딩 URL을 포함한 신규 광고를 생성한다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard-grid">
+
+    <!-- 카드 2: 광고 서버 구조 및 API 요약 -->
+    <article class="card">
+      <div class="card-header">
+        <h2>광고 서버 구조 요약</h2>
+      </div>
+      <div class="card-body">
+
+        <h3 class="sub">세션 · 인증</h3>
+        <ul class="notes-list">
+          <li>관리자 로그인 세션은 <strong>Redis</strong>에 저장된다.</li>
+          <li>세션 ID(<code>session_id</code>)는 <strong>쿠키(admin_session)</strong>에 담아 클라이언트와 교환한다.</li>
+          <li>응답 구조는 <code>code</code>, <code>message</code>, <code>result</code> 형태를 사용한다.</li>
+        </ul>
+
+        <h3 class="sub" style="margin-top:12px;">API 모듈 구성 요약</h3>
+        <ul class="notes-list">
+          <li>관리자(Admin) API: <code>/api/admin/...</code> (로그인 필요)</li>
+          <li>공개(Public) 광고 API: <code>GET /api/public/ad</code> (인증 없음, 랜덤 광고 1건)</li>
+          <li>클라이언트 앱·웹·백엔드는 오직 Public API만 사용</li>
+          <li>이미지 파일은 로컬 저장 후 <code>/static/ads/...</code> 로 서빙</li>
+          <li>광고 등록 시 <strong>target_url을 Buly API로 호출하여 단축 도메인(short_url)으로 변환</strong></li>
+          <li><strong>short_url은 실제 클릭 이벤트에 사용하는 링크</strong>로 활용된다.</li>
+          <li>short_url 및 응답 구조는 향후 <strong>클릭·전환 트래킹 확장</strong>을 고려해 설계했다.</li>
+        </ul>
+
+        <h3 class="sub" style="margin-top:12px;">API 개발 진행 상황</h3>
+        <ul class="notes-list">
+          <li>관리자 로그인: <code>POST /api/admin/login</code></li>
+          <li>로그아웃: <code>POST /api/auth/logout</code></li>
+          <li>관리자 정보 조회: <code>GET /api/admin/me</code></li>
+          <li>광고 등록: <code>POST /api/admin/ads</code></li>
+          <li>광고 전체 리스트: <code>GET /api/admin/ads</code></li>
+          <li>광고 단건 조회: <code>GET /api/admin/ads/{id}</code></li>
+          <li>광고 수정: <code>PUT /api/admin/ads/{id}</code></li>
+          <li>광고 삭제: <code>DELETE /api/admin/ads/{id}</code></li>
+          <li>공개용 랜덤 광고 조회: <code>GET /api/public/ad</code></li>
+        </ul>
+
+        <h3 class="sub" style="margin-top:12px;">예외 처리 정책</h3>
+        <ul class="notes-list">
+          <li>기본 런타임 오류는 공통 핸들러에서 처리한다.</li>
+          <li>필요한 경우 try/catch로 명세된 에러 코드를 반환한다.</li>
+          <li>클라이언트가 실패 원인을 빠르게 파악할 수 있도록 <strong>명확한 code/message</strong>를 제공한다.</li>
+        </ul>
+
+      </div>
+    </article>
+
+    <!-- 카드 3: 공개 광고 API 사용 방법 -->
+    <article class="card">
+      <div class="card-header">
+        <h2>공개 광고 API 사용 방법</h2>
+      </div>
+      <div class="card-body">
+        <h3 class="card-subtitle">1. 엔드포인트</h3>
+        <p class="api-text">
+          여러 백엔드 서버에서 공용으로 사용할 <strong>랜덤 광고 조회 API</strong>.
+          인증이 필요 없는 <strong>public 엔드포인트</strong>다.
+        </p>
+
+        <div class="api-block">
+          <div class="api-method">GET</div>
+          <div class="api-url">/api/public/ad</div>
+        </div>
+
+        <h3 class="card-subtitle">2. 응답 스키마</h3>
+        <p class="api-text">성공 시 JSON 구조는 다음과 같다.</p>
+
+        <pre class="code-block"><code>{
+  "code": 200,
+  "message": "광고 조회 성공",
+  "result": {
+    "id": 1,
+    "title": "Traffic_Pro",
+    "description": "사이트 활성화 프로그램",
+    "image_url": "/static/ads/1765247451.656572_Traffic_Pro.png",
+    "short_url": "https://buly.kr/BTMhqHX",
+    "target_url": "https://marketingmonster.kr/product/..."
+  }
+}</code></pre>
+
+        <table class="api-table">
+          <thead>
+            <tr>
+              <th>필드</th>
+              <th>타입</th>
+              <th>설명</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>code</code></td>
+              <td>number</td>
+              <td>HTTP 와 별도로 사용하는 내부 응답 코드 (200: 성공)</td>
+            </tr>
+            <tr>
+              <td><code>message</code></td>
+              <td>string</td>
+              <td>응답 메시지 (예: "광고 조회 성공")</td>
+            </tr>
+            <tr>
+              <td><code>result.id</code></td>
+              <td>number</td>
+              <td>광고 PK</td>
+            </tr>
+            <tr>
+              <td><code>result.title</code></td>
+              <td>string</td>
+              <td>광고 제목</td>
+            </tr>
+            <tr>
+              <td><code>result.description</code></td>
+              <td>string</td>
+              <td>광고 설명 텍스트</td>
+            </tr>
+            <tr>
+              <td><code>result.image_url</code></td>
+              <td>string</td>
+              <td>이미지 서빙 주소 (예: <code>/static/ads/...</code>)</td>
+            </tr>
+            <tr>
+              <td><code>result.short_url</code></td>
+              <td>string</td>
+              <td>Buly 단축 도메인이 적용된 최종 클릭 URL</td>
+            </tr>
+            <tr>
+              <td><code>result.target_url</code></td>
+              <td>string</td>
+              <td>원래 랜딩 URL (상품 / 랜딩 페이지 등)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 class="card-subtitle">3. 예시: 클라이언트에서 호출</h3>
+        <p class="api-text">
+          예를 들어, 다른 백엔드(Spring, FastAPI 등)에서 이 API를 호출해
+          광고를 노출하려면 다음과 같이 사용할 수 있다.
+        </p>
+
+        <pre class="code-block"><code>// 예: 브라우저 JS에서 호출
+fetch("https://sandboxie.co.kr/api/public/ad")
+  .then(res =&gt; res.json())
+  .then(data =&gt; {
+    const ad = data.result;
+    // ad.image_url 을 이미지 src로,
+    // ad.short_url 을 a href로 사용
+  });</code></pre>
+
+        <p class="api-text">
+          서버 사이드(Spring, FastAPI 등)에서는 <code>/api/public/ad</code> 를
+          HTTP 클라이언트로 호출한 뒤, 응답의 <code>result</code> 를 그대로
+          프론트에 넘겨주거나 뷰 템플릿에 바인딩하면 된다.
+        </p>
+      </div>
+    </article>
+  </section>
+
+  <style>
+    /* 홈 화면 전용 스타일 – 나중에 style.css로 빼도 됨 */
+
+    .hero {
+      display: flex;
+      gap: 24px;
+      align-items: stretch;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .hero-main {
+      flex: 2 1 320px;
+    }
+
+    .hero-side {
+      flex: 1 1 260px;
+    }
+
+    .hero-subtitle {
+      margin-top: 8px;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .hero-actions {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .hero-info-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+      background: #f9fafb;
+      height: 100%;
+      box-sizing: border-box;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .admin-task {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: flex-start;
+    }
+
+    .task-icon {
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .task-body {
+      flex: 1;
+    }
+
+    .task-title {
+      font-weight: 600;
+      color: #111827;
+      text-decoration: none;
+    }
+
+    .task-title:hover {
+      text-decoration: underline;
+    }
+
+    .task-desc {
+      font-size: 13px;
+      color: #6b7280;
+      margin: 2px 0 0;
+    }
+
+    .card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #fff;
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .card-header h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .card-body {
+      font-size: 14px;
+      color: #374151;
+    }
+
+    .card-subtitle {
+      margin: 12px 0 4px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .notes-list {
+      list-style: disc;
+      padding-left: 18px;
+      margin: 0;
+    }
+
+    .notes-list li {
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+
+    .api-text {
+      font-size: 13px;
+      color: #374151;
+      margin: 4px 0 8px;
+      line-height: 1.5;
+    }
+
+    .api-block {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+      margin: 8px 0 12px;
+    }
+
+    .api-method {
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .api-url {
+      padding: 4px 10px;
+      font-size: 12px;
+      background: #f9fafb;
+      color: #111827;
+    }
+
+    .code-block {
+      background: #0f172a;
+      color: #e5e7eb;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      overflow-x: auto;
+      margin: 8px 0 10px;
+    }
+
+    .code-block code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+    }
+
+    .api-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 12px;
+      font-size: 12px;
+    }
+
+    .api-table th,
+    .api-table td {
+      border: 1px solid #e5e7eb;
+      padding: 4px 6px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .api-table th {
+      background: #f9fafb;
+      font-weight: 600;
+    }
+
+    @media (max-width: 700px) {
+      .hero {
+        flex-direction: column;
+      }
+    }
+  </style>
+{% endblock %}
