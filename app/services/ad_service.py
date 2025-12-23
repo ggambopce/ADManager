@@ -10,10 +10,58 @@ from sqlalchemy import or_, and_
 
 from app.models.ad import Ad
 from app.core.config import settings
+from urllib.parse import urlparse
 
 log = logging.getLogger("ad_service")
 
 class AdService:
+
+    @staticmethod
+    def _validate_iframe_src(embed_src: str) -> str:
+        """
+        iframe src 도메인 화이트리스트 검증(최소 안전장치)
+        """
+        allowed_hosts = {"minishop.linkprice.com"}
+        host = urlparse(embed_src).netloc
+        if host not in allowed_hosts:
+            raise ValueError("허용되지 않은 iframe 도메인")
+        return embed_src
+
+    @staticmethod
+    def create_image_ad(db: Session, data, image_url: str):
+        short_url = AdService._create_short_url_with_buly(data.target_url) or data.target_url
+
+        ad = Ad(
+            ad_type="IMAGE",
+            title=data.title,
+            description=data.description,
+            image_url=image_url,
+            target_url=data.target_url,
+            short_url=short_url,
+            is_active=True,
+        )
+        db.add(ad)
+        db.commit()
+        db.refresh(ad)
+        return ad
+
+    @staticmethod
+    def create_iframe_ad(db: Session, data):
+        embed_src = AdService._validate_iframe_src(data.embed_src)
+
+        ad = Ad(
+            ad_type="IFRAME",
+            title=data.title,
+            description=data.description,
+            embed_src=embed_src,
+            embed_width=data.embed_width,
+            embed_height=data.embed_height,
+            is_active=True,
+        )
+        db.add(ad)
+        db.commit()
+        db.refresh(ad)
+        return ad
 
     @staticmethod
     def save_image(upload_file, upload_dir="static/ads"):
@@ -127,12 +175,29 @@ class AdService:
 
     @staticmethod
     def update_ad(db: Session, ad: Ad, update_data: dict):
+        # 공통 허용
+        allowed = {"title", "description"}
+
+        if ad.ad_type == "IMAGE":
+            allowed |= {"target_url"}  # 필요하면 image_url도 포함
+        elif ad.ad_type == "IFRAME":
+            allowed |= {"embed_src", "embed_width", "embed_height"}
+
         for key, value in update_data.items():
-            setattr(ad, key, value)
+            if key in allowed and value is not None:
+                if key == "embed_src":
+                    value = AdService._validate_iframe_src(value)
+                setattr(ad, key, value)
+
+        # IMAGE에서 target_url 바뀌면 short_url도 재생성할지 정책 결정
+        # 보통은 재생성하는 게 일관됨
+        if ad.ad_type == "IMAGE" and "target_url" in update_data and update_data.get("target_url"):
+            ad.short_url = AdService._create_short_url_with_buly(ad.target_url) or ad.target_url
 
         db.commit()
         db.refresh(ad)
         return ad
+
 
     @staticmethod
     def delete_ad(db: Session, ad: Ad):
@@ -141,14 +206,7 @@ class AdService:
 
     @staticmethod
     def random_ad(db: Session):
-        now = datetime.now()
-        query = db.query(Ad).filter(
-            Ad.is_active == True,
-            
-        )
-
-        ads = query.all()
+        ads = db.query(Ad).filter(Ad.is_active == True).all()
         if not ads:
             return None
-
         return random.choice(ads)

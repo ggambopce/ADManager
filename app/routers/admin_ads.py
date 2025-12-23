@@ -156,3 +156,25 @@ async def delete_ad(
         message="광고 삭제 성공",
         result=None,
     )
+
+@router.post("/admin/ads/iframe", response_model=ApiResponse[AdResponse])
+async def create_iframe_ad(
+    body: AdCreate,
+    current_admin=Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    """
+    외부 위젯(iframe) 광고 등록 (JSON)
+    """
+    if body.ad_type != "IFRAME":
+        raise HTTPException(status_code=400, detail="ad_type은 IFRAME이어야 한다.")
+    if not body.embed_src:
+        raise HTTPException(status_code=400, detail="embed_src는 필수다.")
+
+    ad = AdService.create_iframe_ad(db, body)
+
+    return ApiResponse(
+        code=200,
+        message="iframe 광고 등록 성공",
+        result=AdResponse.model_validate(ad),
+    )

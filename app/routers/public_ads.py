@@ -28,11 +28,15 @@ async def random_ad(db: Session = Depends(get_db)):
 
     dto = PublicAdResponse(
         id=ad.id,
+        ad_type=(ad.ad_type or "IMAGE"),
         title=ad.title,
         description=ad.description,
         image_url=ad.image_url,
         short_url=ad.short_url,
         target_url=ad.target_url,
+        embed_src=getattr(ad, "embed_src", None),
+        embed_width=getattr(ad, "embed_width", None),
+        embed_height=getattr(ad, "embed_height", None),
     )
 
     return ApiResponse(

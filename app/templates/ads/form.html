@@ -17,6 +17,15 @@
   <input type="hidden" id="ad-id" value="{{ ad_id or '' }}" />
 
   <form id="ad-form" class="form" enctype="multipart/form-data">
+
+    <div class="form-row">
+      <label for="ad_type">광고 타입</label>
+      <select id="ad_type" name="ad_type" required>
+        <option value="IMAGE" selected>이미지 배너</option>
+        <option value="IFRAME">외부 위젯(iframe)</option>
+      </select>
+    </div>
+
     <div class="form-row">
       <label for="title">제목</label>
       <input type="text" id="title" name="title" required />
@@ -32,15 +41,10 @@
       ></textarea>
     </div>
 
-    <div class="form-row">
+    {# IMAGE 영역 #}
+    <div class="form-row" id="target-row">
       <label for="target_url">랜딩 URL</label>
-      <input
-        type="url"
-        id="target_url"
-        name="target_url"
-        placeholder="https://example.com"
-        required
-      />
+      <input type="url" id="target_url" name="target_url" placeholder="https://example.com" />
     </div>
 
     <div class="form-row" id="image-row">
@@ -49,6 +53,26 @@
       <div id="current-image" class="message"></div>
     </div>
 
+    {# IFRAME 영역 #}
+    <div class="form-row" id="iframe-row" style="display:none;">
+      <label for="embed_src">iframe src</label>
+      <input
+        type="url"
+        id="embed_src"
+        name="embed_src"
+        placeholder="https://minishop.linkprice.com/productbox_realhotdeal.php?...">
+      <small class="message">허용 도메인: minishop.linkprice.com</small>
+    </div>
+
+    <div class="form-row" id="iframe-size-row" style="display:none;">
+      <label>iframe 크기</label>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <input type="number" id="embed_width" name="embed_width" placeholder="width" value="300" min="1">
+        <input type="number" id="embed_height" name="embed_height" placeholder="height" value="250" min="1">
+      </div>
+    </div>
+
+    
     <div class="form-actions">
       <button type="submit" class="btn-primary">
         {% if mode == "edit" %}수정 저장{% else %}등록{% endif %}

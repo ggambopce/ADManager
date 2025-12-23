@@ -1,5 +1,4 @@
 // static/ads_list.js
-
 async function apiFetch(url, options = {}) {
   const isFormData = options.body instanceof FormData;
 
@@ -19,8 +18,12 @@ async function apiFetch(url, options = {}) {
     throw new Error(msg);
   }
 
-  // ApiResponse<AdPageResponse>
   return data?.result ?? data;
+}
+
+function truncate(text, n) {
+  if (!text) return "";
+  return text.length > n ? text.substring(0, n) + "..." : text;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -37,39 +40,37 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadAds() {
     msg.textContent = "";
     try {
-      // page, size 는 필요에 맞게
       const pageRes = await apiFetch("/api/admin/ads?page=0&size=20");
       const ads = pageRes.content ?? [];
 
       tbody.innerHTML = "";
 
       if (ads.length === 0) {
-        tbody.innerHTML =
-          '<tr><td colspan="4">등록된 광고가 없다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5">등록된 광고가 없다.</td></tr>';
         return;
       }
 
       ads.forEach((ad) => {
         const tr = document.createElement("tr");
+        const created = ad.created_at || ad.createdAt || ad.created || "";
+        const type = ad.ad_type || "IMAGE";
 
-        const created =
-          ad.created_at || ad.createdAt || ad.created || "";
+        let link = "";
+        let href = "";
 
-        const urlText =
-          ad.target_url && ad.target_url.length > 25
-            ? ad.target_url.substring(0, 25) + "..."
-            : ad.target_url || "";
+        if (type === "IFRAME") {
+          href = ad.embed_src || "";
+          link = href ? `<a href="${href}" target="_blank" rel="noreferrer noopener">${truncate(href, 35)}</a>` : "";
+        } else {
+          href = ad.short_url || ad.target_url || "";
+          link = href ? `<a href="${href}" target="_blank" rel="noreferrer noopener">${truncate(href, 35)}</a>` : "";
+        }
 
         tr.innerHTML = `
           <td>${ad.id}</td>
+          <td>${type}</td>
           <td><a href="/ads/${ad.id}">${ad.title ?? ""}</a></td>
-          <td>
-            ${
-              ad.target_url
-                ? `<a href="${ad.target_url}" target="_blank" rel="noreferrer noopener">${urlText}</a>`
-                : ""
-            }
-          </td>
+          <td>${link}</td>
           <td>${created}</td>
         `;
 

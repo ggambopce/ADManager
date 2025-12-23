@@ -23,17 +23,23 @@ class Ad(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
 
+    # 공통
+    ad_type = Column(String(20), nullable=False, server_default="IMAGE")  # IMAGE | IFRAME
     title = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
 
+    # IMAGE 전용
     # 정적 파일 경로 (예: /static/ads/1_abcdef.jpg)
     image_url = Column(String(500), nullable=True)
-
     # 원본 이동 URL (제휴 링크, 링크프라이스 딥링크 등)
     target_url = Column(String(1000), nullable=True)
-
     # buly 등 외부 숏링크
     short_url = Column(String(500), nullable=True)
+
+    # IFRAME 전용
+    embed_src = Column(String(2000), nullable=True)
+    embed_width = Column(Integer, nullable=True)
+    embed_height = Column(Integer, nullable=True)
 
     # 논리적 활성화 여부 (soft delete 용도)
     is_active = Column(Boolean, nullable=False, server_default="1")

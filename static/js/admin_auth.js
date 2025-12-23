@@ -101,7 +101,7 @@
         loginForm.style.display = "flex";
         topbarUser.style.display = "none";
 
-        // 비밀번호는 비워두는게 좋다
+        // 비밀번호는 비워둔다
         loginForm.elements["password"].value = "";
       } catch (err) {
         console.error(err);
